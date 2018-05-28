@@ -145,6 +145,38 @@ process_IMBE (dsd_opts* opts, dsd_state* state, int* status_count)
     }
 }
 
+void process_VCW (dsd_opts* opts, dsd_state* state, char vcw_d[144]) {
+  int j;
+  char imbe_fr[8][23];
+  const int *w, *x, *y, *z;
+
+  w = iW;
+  x = iX;
+  y = iY;
+  z = iZ;
+
+  for (j = 0; j < 72; j++) {
+    imbe_fr[*w][*x] = 1 & vcw_d[j * 2];       // bit 1
+    imbe_fr[*y][*z] = 1 & vcw_d[(j * 2) + 1]; // bit 0
+    w++; x++; y++; z++;
+  }
+
+  // check for non-standard c0, explaination: https://github.com/szechyjs/dsd/issues/24
+  char non_standard_word[23] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0};
+  int match = 1;
+  unsigned int i;
+  for (i=0; i<23; i++) {
+    if (imbe_fr[0][i] != non_standard_word[i]) {
+      match = 0;
+      break;
+    }
+  }
+
+  if (!match) {
+    processMbeFrame (opts, state, imbe_fr, NULL, NULL);
+  }
+}
+
 // Uncomment this line for verbose information on the error correction of the LDU bits.
 //#define LDU_DEBUG
 

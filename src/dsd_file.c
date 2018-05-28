@@ -130,6 +130,35 @@ readAmbe2450Data (dsd_opts * opts, dsd_state * state, char *ambe_d)
   return (0);
 }
 
+int
+readP25p1VcwData (dsd_opts * opts, dsd_state * state, char *vcw_d)
+{
+
+  int i, j, k;
+  unsigned char b;
+
+  state->errs2 = 0; // todo: maybe we can persist this somehow
+  state->errs = state->errs2;
+
+  k = 0;
+  for (i = 0; i < 18; i++)
+    {
+      b = fgetc (opts->mbe_in_f);
+      if (feof (opts->mbe_in_f))
+        {
+          return (1);
+        }
+      for (j = 0; j < 8; j++)
+        {
+          vcw_d[k] = (b & 128) >> 7;
+          b = b << 1;
+          b = b & 255;
+          k++;
+        }
+    }
+  return (0);
+}
+
 void
 openMbeInFile (dsd_opts * opts, dsd_state * state)
 {
@@ -148,13 +177,17 @@ openMbeInFile (dsd_opts * opts, dsd_state * state)
   cookie[2] = fgetc (opts->mbe_in_f);
   cookie[3] = fgetc (opts->mbe_in_f);
   cookie[4] = 0;
-  if (strstr (cookie, ".amb") != NULL)
+  if (strstr (cookie, ".imb") != NULL)
+    {
+      state->mbe_file_type = 0;
+    }
+  else if (strstr (cookie, ".amb") != NULL)
     {
       state->mbe_file_type = 1;
     }
-  else if (strstr (cookie, ".imb") != NULL)
+  else if (strstr (cookie, ".vcw") != NULL)
     {
-      state->mbe_file_type = 0;
+      state->mbe_file_type = 2;
     }
   else
     {

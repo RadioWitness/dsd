@@ -1,6 +1,10 @@
-dsd
+notes.txt
+
+build
+sd
 *.[ao]
 *.so*
 *.dylib
-build
+
+*.swp
 .DS_Store

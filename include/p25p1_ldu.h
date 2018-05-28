@@ -18,6 +18,8 @@
  */
 void process_IMBE (dsd_opts* opts, dsd_state* state, int* status_count);
 
+void process_VCW (dsd_opts* opts, dsd_state* state, char vcw_d[144]);
+
 /**
  * Reads an hex word, its parity bits and attempts to error correct it using the Hamming FEC.
  * \param opts The DSD options.

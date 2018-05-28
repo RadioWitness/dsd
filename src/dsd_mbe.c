@@ -16,6 +16,7 @@
  */
 
 #include "dsd.h"
+#include "p25p1_ldu.h"
 
 void
 playMbeFiles (dsd_opts * opts, dsd_state * state, int argc, char **argv)
@@ -24,6 +25,7 @@ playMbeFiles (dsd_opts * opts, dsd_state * state, int argc, char **argv)
   int i;
   char imbe_d[88];
   char ambe_d[49];
+  char vcw_d[144];
 
   for (i = state->optind; i < argc; i++)
     {
@@ -61,6 +63,12 @@ playMbeFiles (dsd_opts * opts, dsd_state * state, int argc, char **argv)
                 {
                   playSynthesizedVoice (opts, state);
                 }
+            }
+          else if (state->mbe_file_type == 2)
+            {
+              state->synctype = 0;
+              readP25p1VcwData (opts, state, vcw_d);
+              process_VCW (opts, state, vcw_d);
             }
           if (exitflag == 1)
             {
